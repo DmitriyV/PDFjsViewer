@@ -3653,9 +3653,10 @@ var TextLayerBuilder = (function TextLayerBuilderClosure() {
       }
     },
 
-    appendText: function TextLayerBuilder_appendText(geom, styles) {
+    appendText: function TextLayerBuilder_appendText(geom, styles, index) {
       var style = styles[geom.fontName];
       var textDiv = document.createElement('div');
+      textDiv.setAttribute('id', index);
       this.textDivs.push(textDiv);
       if (isAllWhitespace(geom.str)) {
         textDiv.dataset.isWhitespace = true;
@@ -3716,7 +3717,7 @@ var TextLayerBuilder = (function TextLayerBuilderClosure() {
 
       var textItems = textContent.items;
       for (var i = 0, len = textItems.length; i < len; i++) {
-        this.appendText(textItems[i], textContent.styles);
+        this.appendText(textItems[i], textContent.styles, i);
       }
       this.divContentDone = true;
     },
