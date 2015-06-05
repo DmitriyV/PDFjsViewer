@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<!-- In production, only one script (pdf.js) is necessary -->
+<!-- In production, change the content of PDFJS.workerSrc below -->
+<script src="../../Scripts/build/pdf.js"></script>
+<script src="../../Scripts/build/pdf.worker.js"></script>
+
+<div class="container">
+    <canvas id="the-canvas" style="border: 1px solid black;">
+        
+    </canvas>
+</div>
+
+<script>
+    // Specify the main script used to create a new PDF.JS web worker.
+    // In production, leave this undefined or change it to point to the
+    // combined `pdf.worker.js` file.
+    PDFJS.workerSrc = '../../Scripts/build/pdf.worker.js';
+</script>
+
+<script type="text/javascript">
+    
+    var DEFAULT_URL = 'helloworld.pdf';
+    var PAGE_TO_VIEW = 2;
+    var SCALE = 2.0;
+
+    var container = document.getElementById('the-canvas');
+
+    // Loading document.
+    PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
+        // Document loaded, retrieving the page.
+        return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
+            var viewport = pdfPage.getViewport(SCALE);
+
+            var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            var renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            return pdfPage.render(renderContext);
+        });
+    });
+</script> 
