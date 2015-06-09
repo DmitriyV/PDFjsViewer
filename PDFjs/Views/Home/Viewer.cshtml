@@ -301,39 +301,56 @@
 </html>
 
 <script type="text/javascript">
-    function getHightlightCoords() {
-var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
-var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-var pageRect = page.canvas.getClientRects()[0];
-var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
-var viewport = page.viewport;
+    function getSelectionRange() {
+        var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
 
-        var selected = [];
-        for (var i = 0; i < selectionRects.length; i++) {
-            debugger;
-            var r = selectionRects[i];
-    selected.push(viewport.convertToPdfPoint(r.left - pageRect.left, r.top - pageRect.top).concat(
-     viewport.convertToPdfPoint(r.right - pageRect.right, r.bottom - pageRect.bottom)));
+        var selection = window.getSelection();
+        if (selection.type !== "Range")
+            return undefined;
+
+        var startId = selection.anchorNode.parentElement.id;
+        var startOffset = selection.anchorOffset;
+
+        var endId = selection.focusNode.parentElement.id;
+        var endOffset = selection.focusOffset;
+
+        return {
+    page: pageIndex,
+    startId: startId, startOffset: startOffset,
+    endId: endId, endOffset: endOffset
         };
-//var selected = selectionRects.map(function (r) {
-        
-    
-return {page: pageIndex, coords: selected};
-}
-
-
-function showHighlight(selected) {
-var pageIndex = selected.page;
-var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-var pageElement = page.canvas.parentElement;
-var viewport = page.viewport;
-selected.coords.forEach(function (rect) {
-  var bounds = viewport.convertToViewportRectangle(rect);
-  var el = document.createElement('div');
-  el.setAttribute('style', 'position: absolute; background-color: pink;' +
-    'left:' + Math.min(bounds[0], bounds[2]) + 'px; top:' + Math.min(bounds[1], bounds[3]) + 'px;' +
-    'width:' + Math.abs(bounds[0] - bounds[2]) + 'px; height:' + Math.abs(bounds[1] - bounds[3]) + 'px;');
-  pageElement.appendChild(el);
-});
-}
+    }
+//    function getHightlightCoords() {
+//var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
+//var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+////var pageRect = page.canvas.getClientRects()[0];
+//
+//var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
+//var viewport = page.viewport;
+//
+//        var selected = [];
+//        for (var i = 0; i < selectionRects.length; i++) {
+//            var r = selectionRects[i];
+//    selected.push(viewport.convertToPdfPoint(r.left, r.top).concat(
+//     viewport.convertToPdfPoint(r.right, r.bottom)));
+//        };
+//
+//return {page: pageIndex, coords: selected};
+//}
+//
+//
+//function showHighlight(selected) {
+//var pageIndex = selected.page;
+//var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+//var pageElement = page.canvas.parentElement;
+//var viewport = page.viewport;
+//selected.coords.forEach(function (rect) {
+//  var bounds = viewport.convertToViewportRectangle(rect);
+//  var el = document.createElement('div');
+//  el.setAttribute('style', 'position: absolute; background-color: pink;' +
+//    'left:' + Math.min(bounds[0], bounds[2]) + 'px; top:' + Math.min(bounds[1], bounds[3]) + 'px;' +
+//    'width:' + Math.abs(bounds[0] - bounds[2]) + 'px; height:' + Math.abs(bounds[1] - bounds[3]) + 'px;');
+//  pageElement.appendChild(el);
+//});
+//}
 </script>
