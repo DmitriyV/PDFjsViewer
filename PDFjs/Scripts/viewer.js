@@ -3688,7 +3688,6 @@ var TextLayerBuilder = (function TextLayerBuilderClosure() {
       textDiv.style.top = top + 'px';
       textDiv.style.fontSize = fontHeight + 'px';
       textDiv.style.fontFamily = style.fontFamily;
-      textDiv.style.backgroundColor = '#ffff12';
       
       textDiv.textContent = geom.str;
       // |fontName| is only used by the Font Inspector. This test will succeed
