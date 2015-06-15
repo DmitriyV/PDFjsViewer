@@ -303,73 +303,107 @@
 </html>
 
 <script type="text/javascript">
-    function getSelectionRange() {
-        var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
+function getHightlightCoords() {
+  var pageIndex = window.PDFViewerApplication.pdfViewer.currentPageNumber - 1;
+  var page = window.PDFViewerApplication.pdfViewer.pages[pageIndex];
+  var pageRect = page.canvas.getClientRects()[0];
+  var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
+  var viewport = page.viewport;
+    var selected = $.map(selectionRects, function(r) {
+        return viewport.convertToPdfPoint(r.left - pageRect.left, r.top - pageRect.top).concat(
+            viewport.convertToPdfPoint(r.right - pageRect.left, r.bottom - pageRect.top));
+    });
+  return {page: pageIndex, coords: selected};
+}
 
-        var selection = window.getSelection();
-        if (selection.type !== "Range")
-            return undefined;
+function showHighlight(selected) {
+  var pageIndex = selected.page;
+  var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+  var pageElement = page.canvas.parentElement;
+  var viewport = page.viewport;
+    //selected.coords.forEach(function(rect) {
+        debugger;
+    var rect = selected.coords;
+        var bounds = viewport.convertToViewportRectangle(rect);
+        var el = document.createElement('div');
+        var left = Math.min(bounds[0], bounds[2]);
+        var top = Math.min(bounds[1], bounds[3]);
+        var width = Math.abs(bounds[0] - bounds[2]);
+        var height = Math.abs(bounds[1] - bounds[3]);
+        el.setAttribute('style', 'position: absolute; background-color: pink;' +
+            'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
 
-        var startId = selection.anchorNode.parentElement.id;
-        var startOffset = selection.anchorOffset;
+        pageElement.appendChild(el);
+    //});
+}
 
-        var endId = selection.focusNode.parentElement.id;
-        var endOffset = selection.focusOffset;
-
-        return {
-    page: pageIndex,
-    startId: startId, startOffset: startOffset,
-    endId: endId, endOffset: endOffset
-        };
-    }
-
-    function showAnnotations() {
-        var selection = getSelectionRange();
-        if (!selection)
-            return;
-
-        var pageIndex = selection.page;
-    var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-    var pageElement = page.canvas.parentElement;
-        //var pageElement = $('.textLayer');
-        var viewport = page.viewport;
-
-        for (var i = selection.startId; i <= selection.endId; i++) {
-            var divText = document.getElementById(i);
-            var rect = divText.getBoundingClientRect();
-
-            var el = document.createElement('div');
-//            var bounds = viewport.convertToViewportRectangle(rect);
+//    function getSelectionRange() {
+//        var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
 //
-//            el.setAttribute('style', 'position: absolute; background-color: pink;' +
-//            'left:' + Math.min(bounds[0], bounds[2]) + 'px; top:' + Math.min(bounds[1], bounds[3]) + 'px;' +
-//            'width:' + Math.abs(bounds[0] - bounds[2]) + 'px; height:' + Math.abs(bounds[1] - bounds[3]) + 'px;');
-
-            el.setAttribute('style', 'position: absolute; background-color: pink;' +
-            'left:' + 100 + 'px; top:' + 100 + 'px;' +
-            'width:' + 500 + 'px; height:' + 200 + 'px;');
-
-            pageElement.appendChild(el);
-
-
+//        var selection = window.getSelection();
+//        if (selection.type !== "Range")
+//            return undefined;
+//
+//        var startId = selection.anchorNode.parentElement.id;
+//        var startOffset = selection.anchorOffset;
+//
+//        var endId = selection.focusNode.parentElement.id;
+//        var endOffset = selection.focusOffset;
+//
+//        return {
+//    page: pageIndex,
+//    startId: startId, startOffset: startOffset,
+//    endId: endId, endOffset: endOffset
+//        };
+//    }
+//
+//    function showAnnotations() {
+//        var selection = getSelectionRange();
+//        if (!selection)
+//            return;
+//
+//        var pageIndex = selection.page;
+//        var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+//        var pageElement = page.canvas.parentElement;
+//
+//        var pageRect = document.getElementsByClassName('textLayer')[pageIndex].getClientRects()[0];
+//        var viewport = page.viewport;
+//
+//        for (var i = selection.startId; i <= selection.endId; i++) {
 //            var divText = document.getElementById(i);
-//            var rect = divText.getBoundingClientRect();
+//            var selectionRects = divText.getClientRects();
 //
-//            $('.textLayer').append('<div id="annotation" style="width: 500; height: 100" class="annotBorder"></div>');
-//            var element = document.getElementById('annotation');
+//            var selectedCoords = [];
+//            for (var j = 0; j < selectionRects.length; j++) {
+//                var r = selectionRects[j];
+//
+//                var x = r.left - pageRect.left;
+//                var y = r.top - pageRect.top;
+//                var coord = viewport.convertToPdfPoint(x, y).concat(viewport.convertToPdfPoint(r.right - pageRect.right, r.bottom - pageRect.bottom));
+//                selectedCoords.push(coord);
+//            }
+//
+//            selectedCoords.forEach(function (rect) {
+//                var bounds = viewport.convertToViewportRectangle(rect);
+//                var el = document.createElement('div');
+//
+//                var left = Math.min(bounds[0], bounds[2]);
+//                var top = Math.min(bounds[1], bounds[3]);
+//                var width = Math.abs(bounds[0] - bounds[2]);
+//                var height = Math.abs(bounds[1] - bounds[3]);
+//
+//                el.setAttribute('style', 'position: absolute; background-color: pink;' +
+//                'left:' + left + 'px; top:' + top + 'px;' +
+//                'width:' + width + 'px; height:' + height + 'px;');
+//
+//    debugger;
+//                pageElement.appendChild(el);
+//        });
+//        }
+//    }
 
 
-//            element.style.left = (canvasOffset.left + rect[0]) + 'px';
-//            element.style.top = (canvasOffset.top + rect[1]) + 'px';
-//            element.style.position = 'absolute';
-//
-//            var transform = viewport.transform;
-//            var transformStr = 'matrix(' + transform.join(',') + ')';
-//            CustomStyle.setProp('transform', element, transformStr);
-//            var transformOriginStr = -rect[0] + 'px ' + -rect[1] + 'px';
-//            CustomStyle.setProp('transformOrigin', element, transformOriginStr);
-        }
-    }
+    /////////////////////////////////////////////////////////
 
 //    function setupAnnotations(page, viewport, canvas, $annotationLayerDiv) {
 //        var canvasOffset = $(canvas).offset();
