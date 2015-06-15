@@ -321,164 +321,21 @@ function showHighlight(selected) {
   var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
   var pageElement = page.canvas.parentElement;
   var viewport = page.viewport;
-    //selected.coords.forEach(function(rect) {
-        debugger;
-    var rect = selected.coords;
-        var bounds = viewport.convertToViewportRectangle(rect);
-        var el = document.createElement('div');
-        var left = Math.min(bounds[0], bounds[2]);
-        var top = Math.min(bounds[1], bounds[3]);
-        var width = Math.abs(bounds[0] - bounds[2]);
-        var height = Math.abs(bounds[1] - bounds[3]);
-        el.setAttribute('style', 'position: absolute; background-color: pink;' +
-            'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
 
-        pageElement.appendChild(el);
-    //});
+  for (var i = 0; i < selected.coords.length; i+=4) {
+      var rect = [selected.coords[i+0], selected.coords[i+1], selected.coords[i+2], selected.coords[i+3]];
+      var bounds = viewport.convertToViewportRectangle(rect);
+      var el = document.createElement('div');
+
+      var left = Math.min(bounds[0], bounds[2]);
+      var top = Math.min(bounds[1], bounds[3]);
+      var width = Math.abs(bounds[0] - bounds[2]);
+      var height = Math.abs(bounds[1] - bounds[3]);
+
+      el.setAttribute('style', 'position: absolute; background-color: rgba(238, 170, 0, .3);' +
+          'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
+
+      pageElement.appendChild(el);
+  }
 }
-
-//    function getSelectionRange() {
-//        var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
-//
-//        var selection = window.getSelection();
-//        if (selection.type !== "Range")
-//            return undefined;
-//
-//        var startId = selection.anchorNode.parentElement.id;
-//        var startOffset = selection.anchorOffset;
-//
-//        var endId = selection.focusNode.parentElement.id;
-//        var endOffset = selection.focusOffset;
-//
-//        return {
-//    page: pageIndex,
-//    startId: startId, startOffset: startOffset,
-//    endId: endId, endOffset: endOffset
-//        };
-//    }
-//
-//    function showAnnotations() {
-//        var selection = getSelectionRange();
-//        if (!selection)
-//            return;
-//
-//        var pageIndex = selection.page;
-//        var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-//        var pageElement = page.canvas.parentElement;
-//
-//        var pageRect = document.getElementsByClassName('textLayer')[pageIndex].getClientRects()[0];
-//        var viewport = page.viewport;
-//
-//        for (var i = selection.startId; i <= selection.endId; i++) {
-//            var divText = document.getElementById(i);
-//            var selectionRects = divText.getClientRects();
-//
-//            var selectedCoords = [];
-//            for (var j = 0; j < selectionRects.length; j++) {
-//                var r = selectionRects[j];
-//
-//                var x = r.left - pageRect.left;
-//                var y = r.top - pageRect.top;
-//                var coord = viewport.convertToPdfPoint(x, y).concat(viewport.convertToPdfPoint(r.right - pageRect.right, r.bottom - pageRect.bottom));
-//                selectedCoords.push(coord);
-//            }
-//
-//            selectedCoords.forEach(function (rect) {
-//                var bounds = viewport.convertToViewportRectangle(rect);
-//                var el = document.createElement('div');
-//
-//                var left = Math.min(bounds[0], bounds[2]);
-//                var top = Math.min(bounds[1], bounds[3]);
-//                var width = Math.abs(bounds[0] - bounds[2]);
-//                var height = Math.abs(bounds[1] - bounds[3]);
-//
-//                el.setAttribute('style', 'position: absolute; background-color: pink;' +
-//                'left:' + left + 'px; top:' + top + 'px;' +
-//                'width:' + width + 'px; height:' + height + 'px;');
-//
-//    debugger;
-//                pageElement.appendChild(el);
-//        });
-//        }
-//    }
-
-
-    /////////////////////////////////////////////////////////
-
-//    function setupAnnotations(page, viewport, canvas, $annotationLayerDiv) {
-//        var canvasOffset = $(canvas).offset();
-//        var promise = page.getAnnotations().then(function (annotationsData) {
-//            viewport = viewport.clone({
-//                dontFlip: true
-//            });
-//
-//            for (var i = 0; i < annotationsData.length; i++) {
-//                var data = annotationsData[i];
-//                var annotation = PDFJS.Annotation.fromData(data);
-//                if (!annotation || !annotation.hasHtml()) {
-//                    continue;
-//                }
-//
-//                var element = annotation.getHtmlElement(page.commonObjs);
-//                data = annotation.getData();
-//                var rect = data.rect;
-//                var view = page.view;
-//                rect = PDFJS.Util.normalizeRect([
-//                rect[0],
-//                view[3] - rect[1] + view[1],
-//                rect[2],
-//                view[3] - rect[3] + view[1]]);
-//                element.style.left = (canvasOffset.left + rect[0]) + 'px';
-//                element.style.top = (canvasOffset.top + rect[1]) + 'px';
-//                element.style.position = 'absolute';
-//
-//                var transform = viewport.transform;
-//                var transformStr = 'matrix(' + transform.join(',') + ')';
-//                CustomStyle.setProp('transform', element, transformStr);
-//                var transformOriginStr = -rect[0] + 'px ' + -rect[1] + 'px';
-//                CustomStyle.setProp('transformOrigin', element, transformOriginStr);
-//
-//                if (data.subtype === 'Link' && !data.url) {
-//                    // In this example,  I do not handle the `Link` annotations without url.
-//                    // If you want to handle those links, see `web/page_view.js`.
-//                    continue;
-//                }
-//                $annotationLayerDiv.append(element);
-//            }
-//        });
-//        return promise;
-//    }
-//    function getHightlightCoords() {
-//var pageIndex = PDFViewerApplication.pdfViewer.currentPageNumber - 1;
-//var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-////var pageRect = page.canvas.getClientRects()[0];
-//
-//var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
-//var viewport = page.viewport;
-//
-//        var selected = [];
-//        for (var i = 0; i < selectionRects.length; i++) {
-//            var r = selectionRects[i];
-//    selected.push(viewport.convertToPdfPoint(r.left, r.top).concat(
-//     viewport.convertToPdfPoint(r.right, r.bottom)));
-//        };
-//
-//return {page: pageIndex, coords: selected};
-//}
-//
-//
-//function showHighlight(selected) {
-//var pageIndex = selected.page;
-//var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-//var pageElement = page.canvas.parentElement;
-//var viewport = page.viewport;
-//selected.coords.forEach(function (rect) {
-//  var bounds = viewport.convertToViewportRectangle(rect);
-//  var el = document.createElement('div');
-//  el.setAttribute('style', 'position: absolute; background-color: pink;' +
-//    'left:' + Math.min(bounds[0], bounds[2]) + 'px; top:' + Math.min(bounds[1], bounds[3]) + 'px;' +
-//    'width:' + Math.abs(bounds[0] - bounds[2]) + 'px; height:' + Math.abs(bounds[1] - bounds[3]) + 'px;');
-//  pageElement.appendChild(el);
-//});
-//}
 </script>
