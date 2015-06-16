@@ -306,46 +306,57 @@
 function getHightlightCoords() {
     var pageIndex = window.PDFViewerApplication.pdfViewer.currentPageNumber - 1;
     var page = window.PDFViewerApplication.pdfViewer.pages[pageIndex];
-    var pageRect = page.canvas.getClientRects()[0];
     var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
 
-    var resultRects = [];
     //костыль
+    var resultRects = [];
     for (var i = 0; i < selectionRects.length; i++) {
         if (i % 2 == 0) {
             resultRects.push(selectionRects[i]);
         }
     }
 
-    //end
+    return {page: pageIndex, coords: convertCoords(resultRects, page)};
+}
+
+function convertCoords(rectangles, page) {
+    var pageRect = page.canvas.getClientRects()[0];
     var viewport = page.viewport;
-      var selected = $.map(resultRects, function(r) {
+
+    var selected = $.map(rectangles, function(r) {
           return viewport.convertToPdfPoint(r.left - pageRect.left, r.top - pageRect.top).concat(
               viewport.convertToPdfPoint(r.right - pageRect.left, r.bottom - pageRect.top));
       });
-    return {page: pageIndex, coords: selected};
+
+    return selected;
 }
 
 function showHighlight(selected) {
-  var pageIndex = selected.page;
-  var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-  var pageElement = page.canvas.parentElement;
-  var viewport = page.viewport;
+    var pageIndex = selected.page;
+    var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+    var pageElement = page.canvas.parentElement;
 
-  for (var i = 0; i < selected.coords.length; i+=4) {
-      var rect = [selected.coords[i+0], selected.coords[i+1], selected.coords[i+2], selected.coords[i+3]];
-      var bounds = viewport.convertToViewportRectangle(rect);
-      var el = document.createElement('div');
+    for (var i = 0; i < selected.coords.length; i+=4) {
+        var rect = [selected.coords[i+0], selected.coords[i+1], selected.coords[i+2], selected.coords[i+3]];
 
-      var left = Math.min(bounds[0], bounds[2]);
-      var top = Math.min(bounds[1], bounds[3]);
-      var width = Math.abs(bounds[0] - bounds[2]);
-      var height = Math.abs(bounds[1] - bounds[3]);
+        var div = createDiv(rect, page);
 
-      el.setAttribute('style', 'position: absolute; background-color: rgba(238, 170, 0, .3);' +
-          'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
+        pageElement.appendChild(div);
+    }
+}
 
-      pageElement.appendChild(el);
-  }
+function createDiv(rect, page) {
+    var bounds = page.viewport.convertToViewportRectangle(rect);
+    var divElement = document.createElement('div');
+
+    var left = Math.min(bounds[0], bounds[2]);
+    var top = Math.min(bounds[1], bounds[3]);
+    var width = Math.abs(bounds[0] - bounds[2]);
+    var height = Math.abs(bounds[1] - bounds[3]);
+
+    divElement.setAttribute('style', 'position: absolute; background-color: rgba(238, 170, 0, .3);' +
+    'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
+
+    return divElement;
 }
 </script>
