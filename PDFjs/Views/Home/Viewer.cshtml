@@ -362,9 +362,9 @@ function createDiv(rect, page) {
     return divElement;
 }
 
-jQuery.fn.selectText = function() {
-  var range, selection;
-  return this.each(function() {
+function selectText(startNode, startOffset, endNode, endOffset) {
+    var range, selection;
+    
     if (document.body.createTextRange) {
       range = document.body.createTextRange();
       range.moveToElementText(this);
@@ -372,14 +372,11 @@ jQuery.fn.selectText = function() {
     } else if (window.getSelection) {
       selection = window.getSelection();
       range = document.createRange();
-      range.selectNodeContents(this);
+      range.setStart(startNode, startOffset);
+      range.setEnd(endNode, endOffset);
       selection.removeAllRanges();
       selection.addRange(range);
     }
-  });
-};
 
-//$('#foo').dblclick(function() {
-//    $(this).selectText();
-//});
+};
 </script>
