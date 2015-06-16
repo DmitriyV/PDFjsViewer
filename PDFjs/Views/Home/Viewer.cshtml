@@ -308,6 +308,8 @@ function getHightlightCoords() {
     var page = window.PDFViewerApplication.pdfViewer.pages[pageIndex];
     var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
 
+    //todo: добавить костыль для IE
+
     //костыль
     var resultRects = [];
     for (var i = 0; i < selectionRects.length; i++) {
