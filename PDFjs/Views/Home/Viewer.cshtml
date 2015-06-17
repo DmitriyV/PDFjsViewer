@@ -304,8 +304,8 @@
 
 <script type="text/javascript">
     var DEFAULT_URL = 'helloworld.pdf';
-    var PAGE_TO_VIEW = 2;
-    var SCALE = 2.0;
+    var PAGE_TO_VIEW = 1;
+    var SCALE = 1.0;
 
     var container = document.getElementById('the-canvas');
 
@@ -327,6 +327,30 @@
             return pdfPage.render(renderContext);
         });
     });
+
+    function getAnnotation(text) {
+        var selection = window.getSelection();
+        if (selection.type !== "Range")
+            return null;
+
+        var startId = selection.anchorNode.parentElement.id;
+        var startOffset = selection.anchorOffset;
+
+        var endId = selection.focusNode.parentElement.id;
+        var endOffset = selection.focusOffset;
+
+        debugger;
+        var regExp = new RegExp('[0-9]*$');
+
+        var startPage = regExp.exec(selection.anchorNode.parentElement.parentElement.parentElement.id)[0];
+        var endPage = regExp.exec(selection.focusNode.parentElement.parentElement.parentElement.id)[0];
+
+        return {
+            startPage: startPage, startId: startId, startOffset: startOffset,
+            endPage: endPage, endId: endId, endOffset: endOffset,
+            text: text
+        };
+    }
 
     function getHightlightCoords() {
         var pageIndex = window.PDFViewerApplication.pdfViewer.currentPageNumber - 1;
