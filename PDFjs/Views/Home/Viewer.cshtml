@@ -303,80 +303,105 @@
 </html>
 
 <script type="text/javascript">
-function getHightlightCoords() {
-    var pageIndex = window.PDFViewerApplication.pdfViewer.currentPageNumber - 1;
-    var page = window.PDFViewerApplication.pdfViewer.pages[pageIndex];
-    var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
+    var DEFAULT_URL = 'helloworld.pdf';
+    var PAGE_TO_VIEW = 2;
+    var SCALE = 2.0;
 
-    //todo: добавить костыль для IE
+    var container = document.getElementById('the-canvas');
 
-    //костыль
-    var resultRects = [];
-    for (var i = 0; i < selectionRects.length; i++) {
-        if (i % 2 == 0) {
-            resultRects.push(selectionRects[i]);
+    // Loading document.
+    PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
+        // Document loaded, retrieving the page.
+        return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
+            var viewport = pdfPage.getViewport(SCALE);
+
+            var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            var renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            return pdfPage.render(renderContext);
+        });
+    });
+
+    function getHightlightCoords() {
+        var pageIndex = window.PDFViewerApplication.pdfViewer.currentPageNumber - 1;
+        var page = window.PDFViewerApplication.pdfViewer.pages[pageIndex];
+        var selectionRects = window.getSelection().getRangeAt(0).getClientRects();
+
+        //todo: добавить костыль для IE
+
+        //костыль
+        var resultRects = [];
+        for (var i = 0; i < selectionRects.length; i++) {
+            if (i % 2 == 0) {
+                resultRects.push(selectionRects[i]);
+            }
+        }
+
+        return {page: pageIndex, coords: convertCoords(resultRects, page)};
+    }
+
+    function convertCoords(rectangles, page) {
+        var pageRect = page.canvas.getClientRects()[0];
+        var viewport = page.viewport;
+
+        var selected = $.map(rectangles, function(r) {
+            return viewport.convertToPdfPoint(r.left - pageRect.left, r.top - pageRect.top).concat(
+                viewport.convertToPdfPoint(r.right - pageRect.left, r.bottom - pageRect.top));
+        });
+
+        return selected;
+    }
+
+    function showHighlight(selected) {
+        var pageIndex = selected.page;
+        var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
+        var pageElement = page.canvas.parentElement;
+
+        for (var i = 0; i < selected.coords.length; i+=4) {
+            var rect = [selected.coords[i+0], selected.coords[i+1], selected.coords[i+2], selected.coords[i+3]];
+
+            var div = createDiv(rect, page);
+
+            pageElement.appendChild(div);
         }
     }
 
-    return {page: pageIndex, coords: convertCoords(resultRects, page)};
-}
+    function createDiv(rect, page) {
+        var bounds = page.viewport.convertToViewportRectangle(rect);
+        var divElement = document.createElement('div');
 
-function convertCoords(rectangles, page) {
-    var pageRect = page.canvas.getClientRects()[0];
-    var viewport = page.viewport;
+        var left = Math.min(bounds[0], bounds[2]);
+        var top = Math.min(bounds[1], bounds[3]);
+        var width = Math.abs(bounds[0] - bounds[2]);
+        var height = Math.abs(bounds[1] - bounds[3]);
 
-    var selected = $.map(rectangles, function(r) {
-          return viewport.convertToPdfPoint(r.left - pageRect.left, r.top - pageRect.top).concat(
-              viewport.convertToPdfPoint(r.right - pageRect.left, r.bottom - pageRect.top));
-      });
+        divElement.setAttribute('style', 'position: absolute; background-color: rgba(238, 170, 0, .3);' +
+            'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
 
-    return selected;
-}
-
-function showHighlight(selected) {
-    var pageIndex = selected.page;
-    var page = PDFViewerApplication.pdfViewer.pages[pageIndex];
-    var pageElement = page.canvas.parentElement;
-
-    for (var i = 0; i < selected.coords.length; i+=4) {
-        var rect = [selected.coords[i+0], selected.coords[i+1], selected.coords[i+2], selected.coords[i+3]];
-
-        var div = createDiv(rect, page);
-
-        pageElement.appendChild(div);
+        return divElement;
     }
-}
 
-function createDiv(rect, page) {
-    var bounds = page.viewport.convertToViewportRectangle(rect);
-    var divElement = document.createElement('div');
-
-    var left = Math.min(bounds[0], bounds[2]);
-    var top = Math.min(bounds[1], bounds[3]);
-    var width = Math.abs(bounds[0] - bounds[2]);
-    var height = Math.abs(bounds[1] - bounds[3]);
-
-    divElement.setAttribute('style', 'position: absolute; background-color: rgba(238, 170, 0, .3);' +
-    'left:' + left + 'px; top:' + top + 'px;' + 'width:' + width + 'px; height:' + height + 'px;');
-
-    return divElement;
-}
-
-function selectText(startNode, startOffset, endNode, endOffset) {
-    var range, selection;
+    function selectText(startNode, startOffset, endNode, endOffset) {
+        var range, selection;
     
-    if (document.body.createTextRange) {
-      range = document.body.createTextRange();
-      range.moveToElementText(this);
-      range.select();
-    } else if (window.getSelection) {
-      selection = window.getSelection();
-      range = document.createRange();
-      range.setStart(startNode, startOffset);
-      range.setEnd(endNode, endOffset);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
+        if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(this);
+            range.select();
+        } else if (window.getSelection) {
+            selection = window.getSelection();
+            range = document.createRange();
+            range.setStart(startNode, startOffset);
+            range.setEnd(endNode, endOffset);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
 
-};
+    };
 </script>
