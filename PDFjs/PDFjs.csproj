@@ -246,7 +246,6 @@
     <Content Include="Content\images\toolbarButton-zoomIn.png" />
     <Content Include="Content\images\toolbarButton-zoomOut%402x.png" />
     <Content Include="Content\images\toolbarButton-zoomOut.png" />
-    <Content Include="Content\Test.css" />
     <Content Include="Content\viewer.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
