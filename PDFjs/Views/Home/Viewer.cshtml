@@ -339,7 +339,6 @@
         var endId = selection.focusNode.parentElement.id;
         var endOffset = selection.focusOffset;
 
-        debugger;
         var regExp = new RegExp('[0-9]*$');
 
         var startPage = regExp.exec(selection.anchorNode.parentElement.parentElement.parentElement.id)[0];
@@ -426,6 +425,28 @@
             selection.removeAllRanges();
             selection.addRange(range);
         }
-
     };
+
+    function selectAnnotation(idStart, startOffset, idEnd, endOffset) {
+        var startNode = $('#' + idStart);
+        var originalText = startNode.text();
+
+        var textInStartSpan = originalText.substr(startOffset);
+        var textStartHtml = originalText.substr(0, startOffset);
+
+        startNode.html(textStartHtml);
+        var startSpan = $('<span />').html(textInStartSpan).appendTo(startNode);
+        
+
+        var endNode = $('#' + idEnd);
+        var originalEndText = endNode.text();
+        var textInEndSpan = originalEndText.substr(0, endOffset);
+        var textEndHtml = originalEndText.substr(endOffset);
+
+        endNode.html('');
+        var endSpan = $('<span />').html(textInEndSpan).appendTo(endNode);
+        endNode.append(textEndHtml);
+
+        selectText(startSpan[0], 0, endSpan[0], 1);
+    }
 </script>
