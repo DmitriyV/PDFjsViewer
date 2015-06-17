@@ -140,6 +140,9 @@
                     <button id="print" class="toolbarButton print hiddenMediumView" title="Print" tabindex="33" data-l10n-id="print">
                         <span data-l10n-id="print_label">Print</span>
                     </button>
+                    <button id="annotation" class="toolbarButton annotation hiddenMediumView" title="Annotation" tabindex="33" data-l10n-id="annotation">
+                        <span data-l10n-id="print_label">Annotation</span>
+                    </button>
                     <button id="download" class="toolbarButton download hiddenMediumView" title="Download" tabindex="34" data-l10n-id="download">
                         <span data-l10n-id="download_label">Download</span>
                     </button>
@@ -303,30 +306,30 @@
 </html>
 
 <script type="text/javascript">
-    var DEFAULT_URL = 'helloworld.pdf';
-    var PAGE_TO_VIEW = 1;
-    var SCALE = 1.0;
-
-    var container = document.getElementById('the-canvas');
-
-    // Loading document.
-    PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
-        // Document loaded, retrieving the page.
-        return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
-            var viewport = pdfPage.getViewport(SCALE);
-
-            var canvas = document.getElementById('the-canvas');
-            var context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            var renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
-            return pdfPage.render(renderContext);
-        });
-    });
+//    var DEFAULT_URL = 'helloworld.pdf';
+//    var PAGE_TO_VIEW = 1;
+//    var SCALE = 1.0;
+//
+//    var container = document.getElementById('the-canvas');
+//
+//    // Loading document.
+//    PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
+//        // Document loaded, retrieving the page.
+//        return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
+//            var viewport = pdfPage.getViewport(SCALE);
+//
+//            var canvas = document.getElementById('the-canvas');
+//            var context = canvas.getContext('2d');
+//            canvas.height = viewport.height;
+//            canvas.width = viewport.width;
+//
+//            var renderContext = {
+//                canvasContext: context,
+//                viewport: viewport
+//            };
+//            return pdfPage.render(renderContext);
+//        });
+//    });
 
     function getAnnotation(text) {
         var selection = window.getSelection();
